@@ -13,6 +13,8 @@ namespace CarInvoiceProblem
         private static readonly double MINIMUM_FARE = 5.0;
         private double CAB_FARE = 0.0;
 
+        private RideRepository rideRepository = new RideRepository();
+
 
         public double CalculateFare(double distance, double time)
         {
@@ -37,6 +39,14 @@ namespace CarInvoiceProblem
                 totalFare += this.CalculateFare(data.distance, data.time);
             }
             return new EnhancedInvoiceSummary(totalFare, rides.Length);
+        }
+        public void MapRidesToUser(string userID, Ride[] rides)
+        {
+            this.rideRepository.AddCabRides(userID, rides);
+        }
+        public EnhancedInvoiceSummary GetEnhancedInvoiceSummary(string userID)
+        {
+            return this.GetMultipleRideFare(this.rideRepository.GetCabRides(userID));
         }
     }
 }
