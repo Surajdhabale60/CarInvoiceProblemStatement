@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static CarInvoiceProblem.RideOption;
 
 namespace CarInvoiceProblem
 {
@@ -12,31 +13,20 @@ namespace CarInvoiceProblem
         private static readonly double COST_PER_MINUTE = 1.0;
         private static readonly double MINIMUM_FARE = 5.0;
         private double CAB_FARE = 0.0;
-
         private RideRepository rideRepository = new RideRepository();
-
-
-        public double CalculateFare(double distance, double time)
+        public double CalculateFare(RideTypes rideTypes, double distance, double time)
         {
-            this.CAB_FARE = (distance * COST_PER_KILOMETER) + (time * COST_PER_MINUTE);
-            return Math.Max(this.CAB_FARE, MINIMUM_FARE);
+            RideOption ride = new RideOption();
+            RideOption rides = ride.SetRideValues(rideTypes);
+            this.CAB_FARE = (distance * rides.COST_PER_KM) + (time * rides.COST_PER_MINUTE);
+            return Math.Max(this.CAB_FARE, rides.MINIMUM_FARE);
         }
-        //public double GetMultipleRideFare(Ride[] rides)
-        //{
-        //    double TOTAL_CAB_FARE = 0.0;
-        //    foreach (var data in rides)
-        //    {
-        //        TOTAL_CAB_FARE += this.CalculateFare(data.distance, data.time);
-        //    }
-        //    return TOTAL_CAB_FARE;
-        //}
-        //Refactor the above method
-        public EnhancedInvoiceSummary GetMultipleRideFare(Ride[] rides)
+        public EnhancedInvoiceSummary GetMultipleRideFare(RideTypes rideTypes, Ride[] rides)
         {
             double totalFare = 0.0;
             foreach (var data in rides)
             {
-                totalFare += this.CalculateFare(data.distance, data.time);
+                totalFare += this.CalculateFare(rideTypes, data.distance, data.time);
             }
             return new EnhancedInvoiceSummary(totalFare, rides.Length);
         }
@@ -44,9 +34,9 @@ namespace CarInvoiceProblem
         {
             this.rideRepository.AddCabRides(userID, rides);
         }
-        public EnhancedInvoiceSummary GetEnhancedInvoiceSummary(string userID)
+        public EnhancedInvoiceSummary GetEnhancedInvoiceSummary(RideTypes rideTypes, string userID)
         {
-            return this.GetMultipleRideFare(this.rideRepository.GetCabRides(userID));
+            return this.GetMultipleRideFare(rideTypes, this.rideRepository.GetCabRides(userID));
         }
     }
 }
